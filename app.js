@@ -3,7 +3,11 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
 app.get('/', function(req, res){
+  if(req.url == "/socket.io/socket.io.js") {
+    res.writeHead(200, {"Content-Type": "text/plain"})
+  }
   res.sendFile(__dirname + '/index.html');
+
 });
 
 io.on('connection', function(socket){
