@@ -155,30 +155,6 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function objArrayToString(arr) {
-    var string = "[";
-    for (var i = 0; i < arr.length; i++) {
-        if (i != arr.length - 1) {
-            string += JSON.stringify(arr[i]) + ", "
-        } else {
-            string += JSON.stringify(arr[i])
-        }
-    }
-    string += "]";
-    return string
-}
-
-function numberWithCommas(nStr) {
-    nStr += '';
-    var x = nStr.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-    }
-    return x1 + x2;
-}
 function generateSquareWithCenter(x, y, radius) {
     var square = {
         x1: x,
