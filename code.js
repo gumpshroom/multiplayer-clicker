@@ -55,8 +55,17 @@ onEvent("start_button", "click", function() {
 onEvent("circle", "click", function(e) {
   socket.emit("clicked", e.x, e.y)
 });
-socket.on("gameover", function() {
+socket.on("gameover", function(gameoverdata, p) {
   setScreen("lose_screen");
+  if(gameoverdata.p1 === p) {
+    setText("yourScore", "your score: " + gameoverdata.p1score)
+    setText("theirScore", "their score: " + gameoverdata.p2score)
+    setText("winner", "winner: " + gameoverdata.judgement)
+  } else {
+    setText("yourScore", "your score: " + gameoverdata.p2score)
+    setText("theirScore", "their score: " + gameoverdata.p1score)
+    setText("winner", "winner: " + gameoverdata.judgement)
+  }
 });
 onEvent("background", "click", function(e) {
   socket.emit("clicked", e.x, e.y)

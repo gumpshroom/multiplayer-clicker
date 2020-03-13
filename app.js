@@ -191,6 +191,8 @@ function generateSquareWithCenter(x, y, radius) {
 function finishGame(p1) {
     var currentGame = findObjectByKey(games, "p1", p1)
     var gameoverdata = {
+        p1: currentGame.p1,
+        p2: currentGame.p2,
         p1score: currentGame.p1score,
         p2score: currentGame.p2score
     }
