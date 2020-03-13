@@ -84,6 +84,7 @@ onEvent("playAgain_button", "click", function() {
 });
 onEvent("tryAgain_button", "click", function() {
   setScreen("welcome_screen");
+  setText("start_button", "ok")
 });
 function clear() {
   socket.emit('disconnect')
