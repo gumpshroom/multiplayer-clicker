@@ -46,7 +46,15 @@ io.on('connection', function (socket) {
 
     ids.push(socket.id)
     socket.on('disconnect', function() {
-        console.log('Got disconnect!');
+        var currentGame = findObjectByKey(games, "p1", socket.id) || findObjectByKey(games, "p2", socket.id)
+        if(currentGame) {
+            if(socket.id === currentGame.p1) {
+                findObjectByKey(sockets, "id", currentGame.p2).emit("oppdisconnect")
+            } else {
+                findObjectByKey(sockets, "id", currentGame.p1).emit("oppdisconnect")
+            }
+            games.splice(games.indexOf(currentGame), 1)
+        }
         var p = ids.indexOf(socket.id);
         sockets.splice(p, 1)
         var i = sockets.indexOf(socket);

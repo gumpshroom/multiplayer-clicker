@@ -34,13 +34,14 @@ socket.on("joinedGame", function(gameData, p) {
 socket.on("queueing", function() {
   setText("start_button", "waiting p2...")
 })
+socket.on("oppdisconnect", function() {
+  alert("opponent disconnected!")
+})
 onEvent("start_button", "click", function() {
   socket.emit("startQueue")
 });
 onEvent("circle", "click", function(e) {
-  var pos = window.findClickPos(e)
-  console.log(pos.x)
-  socket.emit("clicked", pos.x, pos.y)
+  socket.emit("clicked", e.x, e.y)
 });
 onEvent("background", "click", function() {
   setScreen("lose_screen");
