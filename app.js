@@ -203,8 +203,8 @@ function finishGame(p1) {
     } else {
         gameoverdata.judgement = "tie"
     }
-    io.to(`${currentGame.p1}`).emit("gameover", gameoverdata)
-    io.to(`${currentGame.p2}`).emit("gameover", gameoverdata)
+    io.to(`${currentGame.p1}`).emit("gameover", gameoverdata, currentGame.p1)
+    io.to(`${currentGame.p2}`).emit("gameover", gameoverdata, currentGame.p2)
     games.splice(games.indexOf(currentGame), 1)
 
 }
