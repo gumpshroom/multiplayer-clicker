@@ -72,7 +72,7 @@ io.on('connection', function (socket) {
             }
             games.push(newGame)
             socket.emit("joinedGame", newGame, socket.id)
-
+            findObjectByKey(sockets, "id", otherUser).emit("joinedGame", newGame, otherUser)
         }
 
     })
