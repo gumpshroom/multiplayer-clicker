@@ -49,11 +49,14 @@ io.on('connection', function (socket) {
         var currentGame = findObjectByKey(games, "p1", socket.id) || findObjectByKey(games, "p2", socket.id)
         if(currentGame) {
             if(socket.id === currentGame.p1) {
-                findObjectByKey(sockets, "id", currentGame.p2).emit("oppdisconnect")
+                io.to(`${currentGame.p2}`).emit("oppdisconnect")
             } else {
-                findObjectByKey(sockets, "id", currentGame.p1).emit("oppdisconnect")
+                io.to(`${currentGame.p1}`).emit("oppdisconnect")
             }
             games.splice(games.indexOf(currentGame), 1)
+        }
+        if(queue === socket.id) {
+            queue = ""
         }
         var p = ids.indexOf(socket.id);
         sockets.splice(p, 1)
@@ -64,8 +67,8 @@ io.on('connection', function (socket) {
 
         if (queue === "" || queue === socket.id) {
             queue = socket.id;
-            console.log(queue)
-            console.log(ids)
+            //console.log(queue)
+            //console.log(ids)
             socket.emit("queueing")
         } else {
             var otherUser = queue
@@ -83,7 +86,7 @@ io.on('connection', function (socket) {
                 var tempGame = findObjectByKey(games, "p1", socket.id)
                 tempGame.timeRemaining -= 1000
                 socket.emit("update", tempGame, socket.id)
-                findObjectByKey(sockets, "id", tempGame.p2).emit("update", tempGame, tempGame.p2)
+                io.to(`${tempGame.p2}`).emit("update", tempGame, tempGame.p2)
                 if(tempGame.timeRemaining === 0) {
                     finishGame(socket.id)
                     clearInterval(this)
@@ -91,12 +94,14 @@ io.on('connection', function (socket) {
             }, 1000)
             games.push(newGame)
             socket.emit("joinedGame", newGame, socket.id)
-            findObjectByKey(sockets, "id", otherUser).emit("joinedGame", newGame, otherUser)
+            //console.log(otherUser)
+            //console.log(sockets)
+            io.to(`${otherUser}`).emit("joinedGame", newGame, otherUser)
         }
 
     })
     socket.on("clicked", function(mouseX, mouseY) {
-        var currentGame = findObjectByKey(games, "p1", socket.id) || findObjectByKey(games, "p1", socket.id)
+        var currentGame = findObjectByKey(games, "p1", socket.id) || findObjectByKey(games, "p2", socket.id)
         if(currentGame) {
             var clickedPlayer
             var clickedPlayerNum = 0;
@@ -108,16 +113,25 @@ io.on('connection', function (socket) {
                 clickedPlayerNum = 2
             }
             var square = generateSquareWithCenter(currentGame.targetX, currentGame.targetY, 15)
-            console.log(square)
             if(mouseX >= square.x1 && mouseY >= square.y1 && mouseX <= square.x2 && mouseY <= square.y2) {
+                //console.log("wow")
                 currentGame.targetX = getRandomInt(50, 280)
                 currentGame.targetY = getRandomInt(50, 280)
                 if(clickedPlayerNum === 1) {
                     currentGame.p1score ++
-                    findObjectByKey(sockets, "id", currentGame.p2).emit("update", currentGame, currentGame.p2)
+                    io.to(`${currentGame.p2}`).emit("update", currentGame, currentGame.p2)
                 } else {
                     currentGame.p2score ++
-                    findObjectByKey(sockets, "id", currentGame.p1).emit("update", currentGame, currentGame.p1)
+                    io.to(`${currentGame.p1}`).emit("update", currentGame, currentGame.p1)
+                }
+                socket.emit("update", currentGame, clickedPlayer)
+            } else {
+                if(clickedPlayerNum === 1) {
+                    currentGame.p1score --
+                    io.to(`${currentGame.p2}`).emit("update", currentGame, currentGame.p2)
+                } else {
+                    currentGame.p2score --
+                    io.to(`${currentGame.p1}`).emit("update", currentGame, currentGame.p1)
                 }
                 socket.emit("update", currentGame, clickedPlayer)
             }
@@ -167,14 +181,28 @@ function numberWithCommas(nStr) {
 }
 function generateSquareWithCenter(x, y, radius) {
     var square = {
-        x1: x - radius,
-        y1: y - radius,
-        x2: x + radius,
-        y2: y + radius
+        x1: x,
+        y1: y,
+        x2: x + radius * 2,
+        y2: y + radius * 2
     }
     return square
 }
 function finishGame(p1) {
     var currentGame = findObjectByKey(games, "p1", p1)
+    var gameoverdata = {
+        p1score: currentGame.p1score,
+        p2score: currentGame.p2score
+    }
+    if(currentGame.p1score > currentGame.p2score) {
+        gameoverdata.judgement = "player 1 wins"
+    } else if(currentGame.p2score > currentGame.p1score) {
+        gameoverdata.judgement = "player 2 wins"
+    } else {
+        gameoverdata.judgement = "tie"
+    }
+    io.to(`${currentGame.p1}`).emit("gameover", gameoverdata)
+    io.to(`${currentGame.p2}`).emit("gameover", gameoverdata)
+    games.splice(games.indexOf(currentGame), 1)
 
 }

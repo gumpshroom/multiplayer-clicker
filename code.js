@@ -23,24 +23,24 @@ socket.on("joinedGame", function(gameData, p) {
   setPosition("circle", gameData.targetX, gameData.targetY)
   if(gameData.p1 === p) {
     pcode = 1
-    setText("yourScore", gameData.p1score)
-    setText("theirScore", gameData.p2score)
+    setText("total_score", gameData.p1score)
+    setText("opponent_score", gameData.p2score)
   } else {
     pcode = 2
-    setText("yourScore", gameData.p2score)
-    setText("theirScore", gameData.p1score)
+    setText("total_score", gameData.p2score)
+    setText("opponent_score", gameData.p1score)
   }
 })
 socket.on("update", function(gameData, p) {
   setScreen("game_screen")
   setPosition("circle", gameData.targetX, gameData.targetY)
-  setText("timer", )
+  setText("timer", parseInt(gameData.timeRemaining) / 1000)
   if(gameData.p1 === p) {
-    setText("yourScore", gameData.p1score)
-    setText("theirScore", gameData.p2score)
+    setText("total_score", gameData.p1score)
+    setText("opponent_score", gameData.p2score)
   } else {
-    setText("yourScore", gameData.p2score)
-    setText("theirScore", gameData.p1score)
+    setText("total_score", gameData.p2score)
+    setText("opponent_score", gameData.p1score)
   }
 })
 socket.on("queueing", function() {
@@ -55,11 +55,15 @@ onEvent("start_button", "click", function() {
 onEvent("circle", "click", function(e) {
   socket.emit("clicked", e.x, e.y)
 });
-onEvent("background", "click", function() {
+socket.on("gameover", function() {
   setScreen("lose_screen");
 });
+onEvent("background", "click", function(e) {
+  socket.emit("clicked", e.x, e.y)
+})
 onEvent("playAgain_button", "click", function() {
   setScreen("welcome_screen");
+  setText("start_button", "ok")
 });
 onEvent("tryAgain_button", "click", function() {
   setScreen("welcome_screen");
