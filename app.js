@@ -83,9 +83,9 @@ io.on('connection', function (socket) {
                 timeRemaining: 60000
             }
             var timer = setInterval(function() {
-                var tempGame = findObjectByKey(games, "p1", newGame.p1)
+                var tempGame = findObjectByKey(games, "p1", findObjectByKey(games, "p1", socket.id).p1)
                 tempGame.timeRemaining -= 1000
-                socket.emit("update", tempGame, newGame.p1)
+                socket.emit("update", tempGame, findObjectByKey(games, "p1", socket.id).p1)
                 io.to(`${tempGame.p2}`).emit("update", tempGame, tempGame.p2)
                 if(tempGame.timeRemaining <= 0) {
                     finishGame(newGame.p1)
