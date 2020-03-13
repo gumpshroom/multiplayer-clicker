@@ -31,6 +31,18 @@ socket.on("joinedGame", function(gameData, p) {
     setText("theirScore", gameData.p1score)
   }
 })
+socket.on("update", function(gameData, p) {
+  setScreen("game_screen")
+  setPosition("circle", gameData.targetX, gameData.targetY)
+  setText("timer", )
+  if(gameData.p1 === p) {
+    setText("yourScore", gameData.p1score)
+    setText("theirScore", gameData.p2score)
+  } else {
+    setText("yourScore", gameData.p2score)
+    setText("theirScore", gameData.p1score)
+  }
+})
 socket.on("queueing", function() {
   setText("start_button", "waiting p2...")
 })

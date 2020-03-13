@@ -76,8 +76,19 @@ io.on('connection', function (socket) {
                 p1score: 0,
                 p2score: 0,
                 targetX: getRandomInt(50, 280),
-                targetY: getRandomInt(50, 280)
+                targetY: getRandomInt(50, 280),
+                timeRemaining: 60000
             }
+            setInterval(function() {
+                var tempGame = findObjectByKey(games, "p1", socket.id)
+                tempGame.timeRemaining -= 1000
+                socket.emit("update", tempGame, socket.id)
+                findObjectByKey(sockets, "id", tempGame.p2).emit("update", tempGame, tempGame.p2)
+                if(tempGame.timeRemaining === 0) {
+                    finishGame(socket.id)
+                    clearInterval(this)
+                }
+            }, 1000)
             games.push(newGame)
             socket.emit("joinedGame", newGame, socket.id)
             findObjectByKey(sockets, "id", otherUser).emit("joinedGame", newGame, otherUser)
@@ -88,13 +99,28 @@ io.on('connection', function (socket) {
         var currentGame = findObjectByKey(games, "p1", socket.id) || findObjectByKey(games, "p1", socket.id)
         if(currentGame) {
             var clickedPlayer
+            var clickedPlayerNum = 0;
             if(findObjectByKey(games, "p1", socket.id)) {
                 clickedPlayer = findObjectByKey(games, "p1", socket.id).p1
+                clickedPlayerNum = 1
             } else {
                 clickedPlayer = findObjectByKey(games, "p2", socket.id).p2
+                clickedPlayerNum = 2
             }
             var square = generateSquareWithCenter(currentGame.targetX, currentGame.targetY, 15)
             console.log(square)
+            if(mouseX >= square.x1 && mouseY >= square.y1 && mouseX <= square.x2 && mouseY <= square.y2) {
+                currentGame.targetX = getRandomInt(50, 280)
+                currentGame.targetY = getRandomInt(50, 280)
+                if(clickedPlayerNum === 1) {
+                    currentGame.p1score ++
+                    findObjectByKey(sockets, "id", currentGame.p2).emit("update", currentGame, currentGame.p2)
+                } else {
+                    currentGame.p2score ++
+                    findObjectByKey(sockets, "id", currentGame.p1).emit("update", currentGame, currentGame.p1)
+                }
+                socket.emit("update", currentGame, clickedPlayer)
+            }
         }
     })
 });
@@ -147,4 +173,8 @@ function generateSquareWithCenter(x, y, radius) {
         y2: y + radius
     }
     return square
+}
+function finishGame(p1) {
+    var currentGame = findObjectByKey(games, "p1", p1)
+
 }
