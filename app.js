@@ -87,7 +87,7 @@ io.on('connection', function (socket) {
                 tempGame.timeRemaining -= 1000
                 socket.emit("update", tempGame, socket.id)
                 io.to(`${tempGame.p2}`).emit("update", tempGame, tempGame.p2)
-                if(tempGame.timeRemaining === 0) {
+                if(tempGame.timeRemaining <= 0) {
                     finishGame(socket.id)
                     clearInterval(timer)
                 }
