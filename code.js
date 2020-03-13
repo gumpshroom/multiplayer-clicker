@@ -60,11 +60,11 @@ socket.on("gameover", function(gameoverdata, p) {
   if(gameoverdata.p1 === p) {
     setText("yourScore", "your score: " + gameoverdata.p1score)
     setText("theirScore", "their score: " + gameoverdata.p2score)
-    setText("winner", "winner: " + gameoverdata.judgement)
+    setText("winner", "winner: " + gameoverdata.judgement + " (you are player 1)")
   } else {
     setText("yourScore", "your score: " + gameoverdata.p2score)
     setText("theirScore", "their score: " + gameoverdata.p1score)
-    setText("winner", "winner: " + gameoverdata.judgement)
+    setText("winner", "winner: " + gameoverdata.judgement + " (you are player 2)")
   }
 });
 onEvent("background", "click", function(e) {
